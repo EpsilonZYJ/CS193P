@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct EmojiMemoryGameView: View {
+    typealias Card = MemoryGame<String>.Card
+    
     @ObservedObject var viewModel: EmojiMemoryGame
     
     private let aspectRatio: CGFloat = 2/3
@@ -15,25 +17,37 @@ struct EmojiMemoryGameView: View {
     
     var body: some View {
         VStack {
-            ScrollView {
-                cards
-                    .foregroundColor(viewModel.color)
+            cards
+                .foregroundColor(viewModel.color)
+            HStack{
+                score
+                Spacer()
+                shuffle
             }
-            Button("Shuffle"){
-                withAnimation {
-                    viewModel.shuffle()
-                }
-            }
+            .font(.largeTitle)
         }
         .padding()
+    }
+    
+    private var score: some View{
+        Text("Score: \(viewModel.score)")
+    }
+    
+    private var shuffle: some View{
+        Button("Shuffle"){
+            withAnimation {
+                viewModel.shuffle()
+            }
+        }
     }
     
     private var cards: some View {
         AspectVGrid(viewModel.cards, aspectRatio: aspectRatio) { card in
                     CardView(card)
                         .padding(spacing)
+                        .overlay(FlyingNumber(number: scoreChange(causeBy: card)))
                         .onTapGesture {
-                            withAnimation(.easeInOut(duration: 3)){
+                            withAnimation{
                                 viewModel.choose(card)
                             }
                         }
@@ -41,6 +55,9 @@ struct EmojiMemoryGameView: View {
         .foregroundColor(viewModel.color)
     }
     
+    private func scoreChange(causeBy card: Card) -> Int{
+        return 0
+    }
         
         
 //        func gridItemWidthThatFits(
